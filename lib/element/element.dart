@@ -30,6 +30,20 @@ class CodeBlock extends MarkDownElement {
   CodeBlock(this.text);
 }
 
+class MarkDownList extends MarkDownElement {
+  late List<MarkDownListNode> data = [];
+}
+
+class MarkDownListNode {
+  ListType type;
+  int deep;
+  String content;
+
+  MarkDownListNode(this.type, this.deep, this.content);
+}
+
+enum ListType { ordered, unOrdered }
+
 class UnParsed extends MarkDownElement {
   String text = "";
 

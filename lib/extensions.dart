@@ -68,7 +68,39 @@ MarkDownElement? _convertElement(Element element) {
   if (element.tag == 'pre') {
     result = CodeBlock(element.getDeepestText()?.textContent ?? "");
   }
+
+  //List
+  if (element.tag == 'ul') {
+    result = _convertList(element, 0, MarkDownList(), ListType.unOrdered);
+  }
+  if (element.tag == 'ol') {
+    result = _convertList(element, 0, MarkDownList(), ListType.ordered);
+  }
+
   return result;
+}
+
+MarkDownList _convertList(
+    Element element, int deep, MarkDownList list, ListType type) {
+  ListType currentType = type;
+  if (element.tag == "ol") currentType = ListType.ordered;
+  if (element.tag == "ul") currentType = ListType.unOrdered;
+
+  if (element.children != null || element.tag == "li") {
+    for (Node node in element.children!) {
+      if (node is Element) {
+        if (node.tag == "li") {
+          _convertList(node, deep, list, currentType);
+        } else {
+          _convertList(node, deep + 1, list, type);
+        }
+      }
+      if (node is Text) {
+        list.data.add(MarkDownListNode(currentType, deep, node.text));
+      }
+    }
+  }
+  return list;
 }
 
 void _convertEmphasis(Element node, Paragraph paragraph) {

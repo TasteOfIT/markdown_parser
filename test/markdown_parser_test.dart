@@ -77,4 +77,54 @@ void main() {
     expect(isCodeBlock, true);
     expect((elements.first as CodeBlock).text, 'text\n');
   });
+
+  test(
+      "given unordered list, when parse, then the first element is MarkDownList and the content's length of it is 3",
+      () {
+    String text = "- u1\n - u2\n - u3";
+    var elements = parser.parse(text);
+    var isList = elements.first is MarkDownList;
+    expect(isList, true);
+    expect("u1", (elements.first as MarkDownList).data.first.content);
+    expect(0, (elements.first as MarkDownList).data.first.deep);
+    expect(
+        ListType.unOrdered, (elements.first as MarkDownList).data.first.type);
+  });
+
+  test(
+      "given ordered list, when parse, then the first element is MarkDownList and the content's length of it is 3",
+      () {
+    String text = "1. one\n 2. two\n 3. three";
+    var elements = parser.parse(text);
+    var isList = elements.first is MarkDownList;
+    expect(isList, true);
+    expect(3, (elements.first as MarkDownList).data.length);
+    expect("one", (elements.first as MarkDownList).data.first.content);
+    expect(0, (elements.first as MarkDownList).data.first.deep);
+    expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
+  });
+
+  test(
+      "given ordered list, when parse, then the first element is MarkDownList and the content's length of it is 3",
+      () {
+    String text = "1. one\n"
+        "2. two\n"
+        "    - u1\n"
+        "    - u2\n"
+        "    - u3\n"
+        "3. three\n"
+        "    - u1\n"
+        "    - u2\n"
+        "    - u3\n";
+    var elements = parser.parse(text);
+    var isList = elements.first is MarkDownList;
+    expect(isList, true);
+    expect(9, (elements.first as MarkDownList).data.length);
+    expect("one", (elements.first as MarkDownList).data.first.content);
+    expect(0, (elements.first as MarkDownList).data.first.deep);
+    expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
+    expect("u1", (elements.first as MarkDownList).data[2].content);
+    expect(1, (elements.first as MarkDownList).data[2].deep);
+    expect(ListType.unOrdered, (elements.first as MarkDownList).data[2].type);
+  });
 }
