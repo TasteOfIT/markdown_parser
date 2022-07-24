@@ -38,8 +38,9 @@ class MarkDownListNode {
   ListType type;
   int deep;
   String content;
+  int index;
 
-  MarkDownListNode(this.type, this.deep, this.content);
+  MarkDownListNode(this.type, this.deep, this.content, this.index);
 }
 
 enum ListType { ordered, unOrdered }

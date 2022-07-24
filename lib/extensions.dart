@@ -81,8 +81,10 @@ MarkDownElement? _convertElement(Element element) {
 }
 
 MarkDownList _convertList(
-    Element element, int deep, MarkDownList list, ListType type) {
+    Element element, int deep, MarkDownList list, ListType type,
+    {num index = 0}) {
   ListType currentType = type;
+  var currentDeepIndex = index;
   if (element.tag == "ol") currentType = ListType.ordered;
   if (element.tag == "ul") currentType = ListType.unOrdered;
 
@@ -90,14 +92,15 @@ MarkDownList _convertList(
     for (Node node in element.children!) {
       if (node is Element) {
         if (node.tag == "li") {
-          _convertList(node, deep, list, currentType);
+          _convertList(node, deep, list, currentType, index: currentDeepIndex);
         } else {
-          _convertList(node, deep + 1, list, type);
+          _convertList(node, deep + 1, list, type, index: 0);
         }
       }
       if (node is Text) {
-        list.data.add(MarkDownListNode(currentType, deep, node.text));
+        list.data.add(MarkDownListNode(currentType, deep, node.text, currentDeepIndex.toInt()));
       }
+      currentDeepIndex += 1;
     }
   }
   return list;

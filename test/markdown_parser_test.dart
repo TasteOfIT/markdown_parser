@@ -102,6 +102,7 @@ void main() {
     expect("one", (elements.first as MarkDownList).data.first.content);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
+    expect(0, (elements.first as MarkDownList).data.first.index);
   });
 
   test(
