@@ -48,20 +48,7 @@ MarkDownElement? _convertElement(Element element) {
 
   //paragraph
   if (element.tag == 'p') {
-    var paragraph = Paragraph();
-    paragraph.children = [];
-    var children = element.children;
-    if (children != null) {
-      for (var node in children) {
-        if (node is Text) {
-          paragraph.children.add(UnParsed(node.text));
-        }
-        if (node is Element) {
-          _convertEmphasis(node, paragraph);
-        }
-      }
-    }
-    result = paragraph;
+    result = _convertParagraph(element);
   }
 
   //code block
@@ -80,46 +67,88 @@ MarkDownElement? _convertElement(Element element) {
   return result;
 }
 
+Paragraph _convertParagraph(Element element) {
+  var paragraph = Paragraph();
+  paragraph.children = [];
+  var children = element.children;
+  if (children != null) {
+    for (var node in children) {
+      if (node is Text) {
+        paragraph.children.add(UnParsed(node.text));
+      }
+      if (node is Element) {
+        var emphasis = _convertEmphasis(node);
+        if (emphasis != null) {
+          paragraph.children.add(emphasis);
+        }
+      }
+    }
+  }
+  return paragraph;
+}
+
 MarkDownList _convertList(
     Element element, int deep, MarkDownList list, ListType type,
     {num index = 0}) {
+  if (element.children == null) return list;
   ListType currentType = type;
   var currentDeepIndex = index;
   if (element.tag == "ol") currentType = ListType.ordered;
   if (element.tag == "ul") currentType = ListType.unOrdered;
-
-  if (element.children != null || element.tag == "li") {
-    for (Node node in element.children!) {
-      if (node is Element) {
-        if (node.tag == "li") {
-          _convertList(node, deep, list, currentType, index: currentDeepIndex);
-        } else {
+  for (Node node in element.children!) {
+    if (node is Element) {
+      switch (node.tag) {
+        case "ul":
+        case "ol":
           _convertList(node, deep + 1, list, type, index: 0);
-        }
+          break;
+        case "li":
+          if (node.children == null) {
+            break;
+          } else {
+            Paragraph paragraph = Paragraph();
+            paragraph.children = [];
+            MarkDownListNode listNode =
+                MarkDownListNode(currentType, deep, currentDeepIndex.toInt());
+            listNode.childContent = paragraph;
+            list.data.add(listNode);
+            for (Node node in node.children!) {
+              if (node is Text) {
+                paragraph.children.add(UnParsed(node.text));
+              }
+              if (node is Element) {
+                if (node.tag == "ul" || node.tag == "ol") {
+                  _convertList(node, deep + 1, list, currentType, index: 0);
+                } else {
+                  paragraph.children.add(_convertEmphasis(node)!);
+                }
+              }
+            }
+          }
+          break;
       }
-      if (node is Text) {
-        list.data.add(MarkDownListNode(currentType, deep, node.text, currentDeepIndex.toInt()));
-      }
-      currentDeepIndex += 1;
     }
+    currentDeepIndex += 1;
   }
   return list;
 }
 
-void _convertEmphasis(Element node, Paragraph paragraph) {
+Emphasis? _convertEmphasis(Element node) {
+  Emphasis? result;
   var childText = node.children?.first.textContent;
   switch (node.tag) {
     case "strong":
-      paragraph.children.add(Emphasis(EmphasisType.bold, childText ?? ""));
+      result = Emphasis(EmphasisType.bold, childText ?? "");
       break;
     case "em":
       if (node.children?.first is Text) {
-        paragraph.children.add(Emphasis(EmphasisType.italic, childText ?? ""));
+        result = Emphasis(EmphasisType.italic, childText ?? "");
       }
       break;
     case "code":
       if (node.children?.first is Text) {
-        paragraph.children.add(Emphasis(EmphasisType.code, childText ?? ""));
+        result = Emphasis(EmphasisType.code, childText ?? "");
       }
   }
+  return result;
 }

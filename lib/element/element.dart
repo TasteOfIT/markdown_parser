@@ -37,10 +37,10 @@ class MarkDownList extends MarkDownElement {
 class MarkDownListNode {
   ListType type;
   int deep;
-  String content;
   int index;
+  MarkDownElement? childContent;
 
-  MarkDownListNode(this.type, this.deep, this.content, this.index);
+  MarkDownListNode(this.type, this.deep, this.index, {this.childContent});
 }
 
 enum ListType { ordered, unOrdered }

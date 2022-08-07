@@ -85,7 +85,11 @@ void main() {
     var elements = parser.parse(text);
     var isList = elements.first is MarkDownList;
     expect(isList, true);
-    expect("u1", (elements.first as MarkDownList).data.first.content);
+    MarkDownElement element =
+        ((elements.first as MarkDownList).data.first.childContent as Paragraph)
+            .children
+            .first;
+    expect("u1", (element as UnParsed).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(
         ListType.unOrdered, (elements.first as MarkDownList).data.first.type);
@@ -99,7 +103,11 @@ void main() {
     var isList = elements.first is MarkDownList;
     expect(isList, true);
     expect(3, (elements.first as MarkDownList).data.length);
-    expect("one", (elements.first as MarkDownList).data.first.content);
+    MarkDownElement element =
+        ((elements.first as MarkDownList).data.first.childContent as Paragraph)
+            .children
+            .first;
+    expect("one", (element as UnParsed).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
     expect(0, (elements.first as MarkDownList).data.first.index);
@@ -121,10 +129,23 @@ void main() {
     var isList = elements.first is MarkDownList;
     expect(isList, true);
     expect(9, (elements.first as MarkDownList).data.length);
-    expect("one", (elements.first as MarkDownList).data.first.content);
+    MarkDownElement elementOne =
+        ((elements.first as MarkDownList).data.first.childContent as Paragraph)
+            .children
+            .first;
+    expect("one", (elementOne as UnParsed).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
-    expect("u1", (elements.first as MarkDownList).data[2].content);
+    MarkDownElement elementU1 =
+        ((elements.first as MarkDownList).data[2].childContent as Paragraph)
+            .children
+            .first;
+    expect("u1", (elementU1 as UnParsed).text);
+    MarkDownElement element =
+        ((elements.first as MarkDownList).data[2].childContent as Paragraph)
+            .children
+            .first;
+    expect("u1", (element as UnParsed).text);
     expect(1, (elements.first as MarkDownList).data[2].deep);
     expect(ListType.unOrdered, (elements.first as MarkDownList).data[2].type);
   });
