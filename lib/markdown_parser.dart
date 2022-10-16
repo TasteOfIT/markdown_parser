@@ -3,7 +3,7 @@ library markdown_parser;
 import 'dart:convert';
 
 import 'package:markdown/markdown.dart';
-import 'package:markdown_parser/extensions.dart';
+import 'package:markdown_parser/MarkDownConverter.dart';
 
 import 'element/element.dart';
 
@@ -17,8 +17,10 @@ class MarkdownParser {
     var elements = <MarkDownElement>[];
     var nodes = document.parseLines(const LineSplitter().convert(content));
 
+    var markDownConverter = MarkDownConverter();
     for (Node node in nodes) {
-      elements.add(node.convertToMarkDownElement());
+      elements.add(
+          markDownConverter.convert(node, 0) ?? UnParsed(node.textContent));
     }
 
     return elements;

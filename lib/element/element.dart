@@ -43,7 +43,23 @@ class MarkDownListNode {
   MarkDownListNode(this.type, this.deep, this.index, {this.childContent});
 }
 
-enum ListType { ordered, unOrdered }
+enum ListType {
+  ordered,
+  unOrdered;
+
+  static ListType getType(String tag) {
+    ListType result = ListType.ordered;
+    switch (tag) {
+      case "ol":
+        result = ListType.ordered;
+        break;
+      case "ul":
+        result = ListType.unOrdered;
+        break;
+    }
+    return result;
+  }
+}
 
 class UnParsed extends MarkDownElement {
   String text = "";
