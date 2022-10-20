@@ -1,5 +1,4 @@
 import 'package:markdown/markdown.dart';
-import 'package:markdown_parser/element/element.dart';
 
 extension ElementExtensions on Element {
   Text? getDeepestText() {

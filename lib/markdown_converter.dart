@@ -1,6 +1,7 @@
 import 'package:markdown/markdown.dart';
-import 'package:markdown_parser/element/element.dart';
-import 'package:markdown_parser/extensions.dart';
+
+import 'element/element.dart';
+import 'extensions.dart';
 
 class MarkDownConverter {
   static final _headingPattern = RegExp("h[1-6]");
@@ -21,13 +22,11 @@ class MarkDownConverter {
           result = _convertParagraph(node, deep);
           break;
         case "pre":
-          result =
-              CodeBlock(node.getDeepestText()?.textContent ?? node.textContent);
+          result = CodeBlock(node.getDeepestText()?.textContent ?? node.textContent);
           break;
         case "ul":
         case "ol":
-          result = _convertList(
-              node, deep, MarkDownList(), ListType.getType(node.tag));
+          result = _convertList(node, deep, MarkDownList(), ListType.getType(node.tag));
           break;
         case "strong":
           result = Emphasis(EmphasisType.bold, childText ?? node.textContent);
@@ -54,9 +53,7 @@ class MarkDownConverter {
     return paragraph;
   }
 
-  MarkDownList _convertList(
-      Element element, int deep, MarkDownList list, ListType type,
-      {num index = 0}) {
+  MarkDownList _convertList(Element element, int deep, MarkDownList list, ListType type, {num index = 0}) {
     if (element.children == null) return list;
     ListType currentType = type;
     var currentDeepIndex = index;
@@ -71,8 +68,7 @@ class MarkDownConverter {
             if (node.children != null) {
               Paragraph paragraph = Paragraph();
               paragraph.children = [];
-              MarkDownListNode listNode =
-                  MarkDownListNode(currentType, deep, currentDeepIndex.toInt());
+              MarkDownListNode listNode = MarkDownListNode(currentType, deep, currentDeepIndex.toInt());
               listNode.childContent = paragraph;
               list.data.add(listNode);
               for (Node node in node.children!) {
@@ -81,9 +77,7 @@ class MarkDownConverter {
                 }
                 if (node is Element) {
                   if (node.tag == "ul" || node.tag == "ol") {
-                    _convertList(
-                        node, deep + 1, list, ListType.getType(node.tag),
-                        index: 0);
+                    _convertList(node, deep + 1, list, ListType.getType(node.tag), index: 0);
                   } else {
                     paragraph.children.add(convert(node, deep + 1)!);
                   }

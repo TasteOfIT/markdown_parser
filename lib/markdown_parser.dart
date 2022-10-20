@@ -3,9 +3,9 @@ library markdown_parser;
 import 'dart:convert';
 
 import 'package:markdown/markdown.dart';
-import 'package:markdown_parser/MarkDownConverter.dart';
 
 import 'element/element.dart';
+import 'markdown_converter.dart';
 
 class MarkdownParser {
   Document document = Document(
@@ -19,8 +19,7 @@ class MarkdownParser {
 
     var markDownConverter = MarkDownConverter();
     for (Node node in nodes) {
-      elements.add(
-          markDownConverter.convert(node, 0) ?? UnParsed(node.textContent));
+      elements.add(markDownConverter.convert(node, 0) ?? UnParsed(node.textContent));
     }
 
     return elements;
