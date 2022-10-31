@@ -89,7 +89,7 @@ void main() {
         ((elements.first as MarkDownList).data.first.childContent as Paragraph)
             .children
             .first;
-    expect("u1", (element as UnParsed).text);
+    expect("u1", (element as MarkdownText).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(
         ListType.unOrdered, (elements.first as MarkDownList).data.first.type);
@@ -107,7 +107,7 @@ void main() {
         ((elements.first as MarkDownList).data.first.childContent as Paragraph)
             .children
             .first;
-    expect("one", (element as UnParsed).text);
+    expect("one", (element as MarkdownText).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
     expect(0, (elements.first as MarkDownList).data.first.index);
@@ -133,20 +133,38 @@ void main() {
         ((elements.first as MarkDownList).data.first.childContent as Paragraph)
             .children
             .first;
-    expect("one", (elementOne as UnParsed).text);
+    expect("one", (elementOne as MarkdownText).text);
     expect(0, (elements.first as MarkDownList).data.first.deep);
     expect(ListType.ordered, (elements.first as MarkDownList).data.first.type);
     MarkDownElement elementU1 =
         ((elements.first as MarkDownList).data[2].childContent as Paragraph)
             .children
             .first;
-    expect("u1", (elementU1 as UnParsed).text);
+    expect("u1", (elementU1 as MarkdownText).text);
     MarkDownElement element =
         ((elements.first as MarkDownList).data[2].childContent as Paragraph)
             .children
             .first;
-    expect("u1", (element as UnParsed).text);
+    expect("u1", (element as MarkdownText).text);
     expect(1, (elements.first as MarkDownList).data[2].deep);
     expect(ListType.unOrdered, (elements.first as MarkDownList).data[2].type);
+  });
+
+  test(
+      "given markdown image,when parse, then the first element is Paragraph and its first child is `MarkDownImage`",
+      () {
+    String text =
+        "![img](https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg)";
+
+    List<MarkDownElement> elements = parser.parse(text);
+
+    var isParagraph = elements.first is Paragraph;
+    expect(isParagraph, true);
+    var firstChild = (elements.first as Paragraph).children.first;
+    var isMarkDownImage = firstChild is MarkDownImage;
+    expect(isMarkDownImage, true);
+    expect((firstChild as MarkDownImage).address,
+        "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg");
+    expect(firstChild.alt, 'img');
   });
 }

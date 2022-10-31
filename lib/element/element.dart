@@ -24,6 +24,13 @@ class Paragraph extends MarkDownElement {
   late List<MarkDownElement> children;
 }
 
+class MarkDownImage extends MarkDownElement {
+  String address;
+  String alt;
+
+  MarkDownImage(this.address, this.alt);
+}
+
 class CodeBlock extends MarkDownElement {
   String text;
 
@@ -61,8 +68,8 @@ enum ListType {
   }
 }
 
-class UnParsed extends MarkDownElement {
+class MarkdownText extends MarkDownElement {
   String text = "";
 
-  UnParsed(this.text);
+  MarkdownText(this.text);
 }

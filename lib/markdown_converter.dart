@@ -8,8 +8,8 @@ class MarkDownConverter {
 
   MarkDownElement? convert(Node node, int deep) {
     MarkDownElement? result;
-    if (Node is Text) {
-      result = UnParsed(node.textContent);
+    if (node is Text) {
+      result = MarkdownText(node.textContent);
     }
     if (node is Element) {
       var childText = node.children?.first.textContent;
@@ -36,6 +36,11 @@ class MarkDownConverter {
           break;
         case "code":
           result = Emphasis(EmphasisType.code, childText ?? node.textContent);
+          break;
+        case "img":
+          result = MarkDownImage(
+              node.attributes["src"] ?? "", node.attributes["alt"] ?? "");
+          break;
       }
     }
     return result;
@@ -47,7 +52,7 @@ class MarkDownConverter {
     var children = element.children;
     if (children != null) {
       for (var node in children) {
-        paragraph.children.add(convert(node, deep + 1) ?? UnParsed(""));
+        paragraph.children.add(convert(node, deep + 1) ?? MarkdownText(""));
       }
     }
     return paragraph;
@@ -73,7 +78,7 @@ class MarkDownConverter {
               list.data.add(listNode);
               for (Node node in node.children!) {
                 if (node is Text) {
-                  paragraph.children.add(UnParsed(node.text));
+                  paragraph.children.add(MarkdownText(node.text));
                 }
                 if (node is Element) {
                   if (node.tag == "ul" || node.tag == "ol") {

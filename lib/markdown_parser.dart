@@ -19,7 +19,8 @@ class MarkdownParser {
 
     var markDownConverter = MarkDownConverter();
     for (Node node in nodes) {
-      elements.add(markDownConverter.convert(node, 0) ?? UnParsed(node.textContent));
+      elements.add(
+          markDownConverter.convert(node, 0) ?? MarkdownText(node.textContent));
     }
 
     return elements;
