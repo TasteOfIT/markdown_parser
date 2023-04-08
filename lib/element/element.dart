@@ -1,10 +1,10 @@
-abstract class MarkDownElement {}
+abstract class MarkdownElement {}
 
-class Paragraphs extends MarkDownElement {
-  late List<MarkDownElement> children;
+class Paragraphs extends MarkdownElement {
+  late List<MarkdownElement> children;
 }
 
-class Heading extends MarkDownElement {
+class Heading extends MarkdownElement {
   int level;
   String text;
 
@@ -13,41 +13,41 @@ class Heading extends MarkDownElement {
 
 enum EmphasisType { bold, italic, boldAndItalic, code }
 
-class Emphasis extends MarkDownElement {
+class Emphasis extends MarkdownElement {
   EmphasisType type;
   String text;
 
   Emphasis(this.type, this.text);
 }
 
-class Paragraph extends MarkDownElement {
-  late List<MarkDownElement> children;
+class Paragraph extends MarkdownElement {
+  late List<MarkdownElement> children;
 }
 
-class MarkDownImage extends MarkDownElement {
+class MarkdownImage extends MarkdownElement {
   String address;
   String alt;
 
-  MarkDownImage(this.address, this.alt);
+  MarkdownImage(this.address, this.alt);
 }
 
-class CodeBlock extends MarkDownElement {
+class CodeBlock extends MarkdownElement {
   String text;
 
   CodeBlock(this.text);
 }
 
-class MarkDownList extends MarkDownElement {
-  late List<MarkDownListNode> data = [];
+class MarkdownList extends MarkdownElement {
+  late List<MarkdownListNode> data = [];
 }
 
-class MarkDownListNode {
+class MarkdownListNode {
   ListType type;
   int deep;
   int index;
-  MarkDownElement? childContent;
+  MarkdownElement? childContent;
 
-  MarkDownListNode(this.type, this.deep, this.index, {this.childContent});
+  MarkdownListNode(this.type, this.deep, this.index, {this.childContent});
 }
 
 enum ListType {
@@ -68,7 +68,7 @@ enum ListType {
   }
 }
 
-class MarkdownText extends MarkDownElement {
+class MarkdownText extends MarkdownElement {
   String text = "";
 
   MarkdownText(this.text);

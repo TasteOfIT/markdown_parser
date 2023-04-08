@@ -3,11 +3,11 @@ import 'package:markdown/markdown.dart';
 import 'element/element.dart';
 import 'extensions.dart';
 
-class MarkDownConverter {
+class MarkdownConverter {
   static final _headingPattern = RegExp("h[1-6]");
 
-  MarkDownElement? convert(Node node, int deep) {
-    MarkDownElement? result;
+  MarkdownElement? convert(Node node, int deep) {
+    MarkdownElement? result;
     if (node is Text) {
       result = MarkdownText(node.textContent);
     }
@@ -26,7 +26,7 @@ class MarkDownConverter {
           break;
         case "ul":
         case "ol":
-          result = _convertList(node, deep, MarkDownList(), ListType.getType(node.tag));
+          result = _convertList(node, deep, MarkdownList(), ListType.getType(node.tag));
           break;
         case "strong":
           result = Emphasis(EmphasisType.bold, childText ?? node.textContent);
@@ -38,8 +38,7 @@ class MarkDownConverter {
           result = Emphasis(EmphasisType.code, childText ?? node.textContent);
           break;
         case "img":
-          result = MarkDownImage(
-              node.attributes["src"] ?? "", node.attributes["alt"] ?? "");
+          result = MarkdownImage(node.attributes["src"] ?? "", node.attributes["alt"] ?? "");
           break;
       }
     }
@@ -58,7 +57,7 @@ class MarkDownConverter {
     return paragraph;
   }
 
-  MarkDownList _convertList(Element element, int deep, MarkDownList list, ListType type, {num index = 0}) {
+  MarkdownList _convertList(Element element, int deep, MarkdownList list, ListType type, {num index = 0}) {
     if (element.children == null) return list;
     ListType currentType = type;
     var currentDeepIndex = index;
@@ -73,7 +72,7 @@ class MarkDownConverter {
             if (node.children != null) {
               Paragraph paragraph = Paragraph();
               paragraph.children = [];
-              MarkDownListNode listNode = MarkDownListNode(currentType, deep, currentDeepIndex.toInt());
+              MarkdownListNode listNode = MarkdownListNode(currentType, deep, currentDeepIndex.toInt());
               listNode.childContent = paragraph;
               list.data.add(listNode);
               for (Node node in node.children!) {

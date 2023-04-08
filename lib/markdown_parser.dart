@@ -13,14 +13,13 @@ class MarkdownParser {
       blockSyntaxes: ExtensionSet.gitHubFlavored.blockSyntaxes,
       inlineSyntaxes: ExtensionSet.gitHubFlavored.inlineSyntaxes);
 
-  List<MarkDownElement> parse(String content) {
-    var elements = <MarkDownElement>[];
+  List<MarkdownElement> parse(String content) {
+    var elements = <MarkdownElement>[];
     var nodes = document.parseLines(const LineSplitter().convert(content));
 
-    var markDownConverter = MarkDownConverter();
+    var markDownConverter = MarkdownConverter();
     for (Node node in nodes) {
-      elements.add(
-          markDownConverter.convert(node, 0) ?? MarkdownText(node.textContent));
+      elements.add(markDownConverter.convert(node, 0) ?? MarkdownText(node.textContent));
     }
 
     return elements;
