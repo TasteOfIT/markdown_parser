@@ -7,6 +7,8 @@ import 'package:markdown/markdown.dart';
 import 'element/element.dart';
 import 'markdown_converter.dart';
 
+export 'element/element.dart';
+
 class MarkdownParser {
   Document document = Document(
       extensionSet: ExtensionSet.gitHubFlavored,

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:markdown_parser/element/element.dart';
 import 'package:markdown_parser/markdown_parser.dart';
 
 void main() {
