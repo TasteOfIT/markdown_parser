@@ -6,7 +6,7 @@ import 'extensions.dart';
 class MarkdownConverter {
   static final _headingPattern = RegExp("h[1-6]");
 
-  MarkdownElement? convert(Node node, int deep) {
+  MarkdownElement? convert(Node node, int depth) {
     MarkdownElement? result;
     if (node is Text) {
       result = MarkdownText(node.textContent);
@@ -19,14 +19,14 @@ class MarkdownConverter {
       }
       switch (node.tag) {
         case "p":
-          result = _convertParagraph(node, deep);
+          result = _convertParagraph(node, depth);
           break;
         case "pre":
           result = CodeBlock(node.getDeepestText()?.textContent ?? node.textContent);
           break;
         case "ul":
         case "ol":
-          result = _convertList(node, deep, MarkdownList(), ListType.getType(node.tag));
+          result = _convertList(node, depth, MarkdownList(), ListType.getType(node.tag));
           break;
         case "strong":
           result = Emphasis(EmphasisType.bold, childText ?? node.textContent);
@@ -45,19 +45,19 @@ class MarkdownConverter {
     return result;
   }
 
-  Paragraph _convertParagraph(Element element, int deep) {
+  Paragraph _convertParagraph(Element element, int depth) {
     var paragraph = Paragraph();
     paragraph.children = [];
     var children = element.children;
     if (children != null) {
       for (var node in children) {
-        paragraph.children.add(convert(node, deep + 1) ?? MarkdownText(""));
+        paragraph.children.add(convert(node, depth + 1) ?? MarkdownText(""));
       }
     }
     return paragraph;
   }
 
-  MarkdownList _convertList(Element element, int deep, MarkdownList list, ListType type, {num index = 0}) {
+  MarkdownList _convertList(Element element, int depth, MarkdownList list, ListType type, {num index = 0}) {
     if (element.children == null) return list;
     ListType currentType = type;
     var currentDeepIndex = index;
@@ -66,13 +66,13 @@ class MarkdownConverter {
         switch (node.tag) {
           case "ul":
           case "ol":
-            _convertList(node, deep + 1, list, type, index: 0);
+            _convertList(node, depth + 1, list, type, index: 0);
             break;
           case "li":
             if (node.children != null) {
               Paragraph paragraph = Paragraph();
               paragraph.children = [];
-              MarkdownListNode listNode = MarkdownListNode(currentType, deep, currentDeepIndex.toInt());
+              MarkdownListNode listNode = MarkdownListNode(currentType, depth, currentDeepIndex.toInt());
               listNode.childContent = paragraph;
               list.data.add(listNode);
               for (Node node in node.children!) {
@@ -81,9 +81,9 @@ class MarkdownConverter {
                 }
                 if (node is Element) {
                   if (node.tag == "ul" || node.tag == "ol") {
-                    _convertList(node, deep + 1, list, ListType.getType(node.tag), index: 0);
+                    _convertList(node, depth + 1, list, ListType.getType(node.tag), index: 0);
                   } else {
-                    paragraph.children.add(convert(node, deep + 1)!);
+                    paragraph.children.add(convert(node, depth + 1)!);
                   }
                 }
               }

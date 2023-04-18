@@ -43,11 +43,11 @@ class MarkdownList extends MarkdownElement {
 
 class MarkdownListNode {
   ListType type;
-  int deep;
+  int depth;
   int index;
   MarkdownElement? childContent;
 
-  MarkdownListNode(this.type, this.deep, this.index, {this.childContent});
+  MarkdownListNode(this.type, this.depth, this.index, {this.childContent});
 }
 
 enum ListType {

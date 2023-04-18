@@ -75,7 +75,7 @@ void main() {
     expect(isList, true);
     MarkdownElement element = ((elements.first as MarkdownList).data.first.childContent as Paragraph).children.first;
     expect("u1", (element as MarkdownText).text);
-    expect(0, (elements.first as MarkdownList).data.first.deep);
+    expect(0, (elements.first as MarkdownList).data.first.depth);
     expect(ListType.unOrdered, (elements.first as MarkdownList).data.first.type);
   });
 
@@ -88,7 +88,7 @@ void main() {
     expect(3, (elements.first as MarkdownList).data.length);
     MarkdownElement element = ((elements.first as MarkdownList).data.first.childContent as Paragraph).children.first;
     expect("one", (element as MarkdownText).text);
-    expect(0, (elements.first as MarkdownList).data.first.deep);
+    expect(0, (elements.first as MarkdownList).data.first.depth);
     expect(ListType.ordered, (elements.first as MarkdownList).data.first.type);
     expect(0, (elements.first as MarkdownList).data.first.index);
   });
@@ -110,13 +110,13 @@ void main() {
     expect(9, (elements.first as MarkdownList).data.length);
     MarkdownElement elementOne = ((elements.first as MarkdownList).data.first.childContent as Paragraph).children.first;
     expect("one", (elementOne as MarkdownText).text);
-    expect(0, (elements.first as MarkdownList).data.first.deep);
+    expect(0, (elements.first as MarkdownList).data.first.depth);
     expect(ListType.ordered, (elements.first as MarkdownList).data.first.type);
     MarkdownElement elementU1 = ((elements.first as MarkdownList).data[2].childContent as Paragraph).children.first;
     expect("u1", (elementU1 as MarkdownText).text);
     MarkdownElement element = ((elements.first as MarkdownList).data[2].childContent as Paragraph).children.first;
     expect("u1", (element as MarkdownText).text);
-    expect(1, (elements.first as MarkdownList).data[2].deep);
+    expect(1, (elements.first as MarkdownList).data[2].depth);
     expect(ListType.unOrdered, (elements.first as MarkdownList).data[2].type);
   });
 
