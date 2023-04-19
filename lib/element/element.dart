@@ -1,75 +1,40 @@
-abstract class MarkdownElement {}
+part 'group_element.dart';
 
-class Paragraphs extends MarkdownElement {
-  late List<MarkdownElement> children;
+part 'link_element.dart';
+
+part 'text_element.dart';
+
+abstract class MarkdownElement {
+  final ElementType type;
+
+  MarkdownElement(this.type);
 }
 
-class Heading extends MarkdownElement {
-  int level;
-  String text;
+enum ElementType {
+  paragraph('p', isParent: true),
+  blockQuote('blockquote', isParent: true, inline: false),
+  preformatted('pre', isParent: true, inline: false),
+  orderList('ol', isParent: true, inline: false),
+  unOrderList('ul', isParent: true, inline: false),
+  listLine('li', isParent: true, inline: false),
+  heading('h[1-6]', isParent: false, inline: false),
+  bold('strong'),
+  italic('em'),
+  code('code'),
+  image('img'),
+  link('a'),
+  plain('');
 
-  Heading(this.level, this.text);
-}
+  final String tag;
+  final bool isParent; // need break down to smaller elements
+  final bool inline; // need wrap on display
 
-enum EmphasisType { bold, italic, boldAndItalic, code }
+  static final _headingPattern = RegExp(ElementType.heading.tag);
 
-class Emphasis extends MarkdownElement {
-  EmphasisType type;
-  String text;
+  const ElementType(this.tag, {this.isParent = false, this.inline = true});
 
-  Emphasis(this.type, this.text);
-}
-
-class Paragraph extends MarkdownElement {
-  late List<MarkdownElement> children;
-}
-
-class MarkdownImage extends MarkdownElement {
-  String address;
-  String alt;
-
-  MarkdownImage(this.address, this.alt);
-}
-
-class CodeBlock extends MarkdownElement {
-  String text;
-
-  CodeBlock(this.text);
-}
-
-class MarkdownList extends MarkdownElement {
-  late List<MarkdownListNode> data = [];
-}
-
-class MarkdownListNode {
-  ListType type;
-  int depth;
-  int index;
-  MarkdownElement? childContent;
-
-  MarkdownListNode(this.type, this.depth, this.index, {this.childContent});
-}
-
-enum ListType {
-  ordered,
-  unOrdered;
-
-  static ListType getType(String tag) {
-    ListType result = ListType.ordered;
-    switch (tag) {
-      case "ol":
-        result = ListType.ordered;
-        break;
-      case "ul":
-        result = ListType.unOrdered;
-        break;
-    }
-    return result;
+  static ElementType of(String tag) {
+    if (_headingPattern.hasMatch(tag)) return ElementType.heading;
+    return ElementType.values.firstWhere((element) => element.tag == tag, orElse: () => ElementType.plain);
   }
-}
-
-class MarkdownText extends MarkdownElement {
-  String text = "";
-
-  MarkdownText(this.text);
 }
