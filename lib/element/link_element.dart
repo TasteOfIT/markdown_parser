@@ -3,17 +3,17 @@ part of 'element.dart';
 abstract class Link extends MarkdownElement {
   String address;
 
-  Link(this.address, super.type);
+  Link(this.address, super.type, super.text);
 }
 
 class ImageLink extends Link {
-  String alt;
+  final String alt;
 
-  ImageLink(String address, this.alt) : super(address, ElementType.image);
+  ImageLink(String address, this.alt) : super(address, ElementType.image, alt);
 }
 
 class UrlLink extends Link {
-  String text;
+  final String name;
 
-  UrlLink(String address, this.text) : super(address, ElementType.link);
+  UrlLink(String address, this.name) : super(address, ElementType.link, name);
 }

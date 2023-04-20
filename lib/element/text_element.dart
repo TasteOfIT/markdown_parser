@@ -1,9 +1,7 @@
 part of 'element.dart';
 
 class Plain extends MarkdownElement {
-  String text = "";
-
-  Plain(this.text, {ElementType type = ElementType.plain}) : super(type);
+  Plain(String text, {ElementType type = ElementType.plain}) : super(type, text);
 }
 
 class Heading extends Plain {

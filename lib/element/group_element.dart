@@ -3,7 +3,7 @@ part of 'element.dart';
 abstract class Group<T extends MarkdownElement> extends MarkdownElement {
   List<T> children = List.empty(growable: true);
 
-  Group(super.type);
+  Group(ElementType type) : super(type, '');
 }
 
 class Paragraph extends Group<MarkdownElement> {

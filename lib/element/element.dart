@@ -6,8 +6,9 @@ part 'text_element.dart';
 
 abstract class MarkdownElement {
   final ElementType type;
+  final String text;
 
-  MarkdownElement(this.type);
+  MarkdownElement(this.type, this.text);
 }
 
 enum ElementType {
