@@ -1,28 +1,22 @@
 part of 'element.dart';
 
-class Plain extends MarkdownElement {
-  Plain(String text, {ElementType type = ElementType.plain}) : super(type, text);
-}
-
-class Heading extends Plain {
-  int level;
-
-  Heading(this.level, String text) : super(text, type: ElementType.heading);
+class TextElem extends Inline {
+  TextElem(String text) : super(ElemType.text, text: text);
 }
 
 enum EmphasisType {
-  bold(ElementType.bold),
-  italic(ElementType.italic);
+  bold(ElemType.bold),
+  italic(ElemType.italic);
 
-  final ElementType type;
+  final ElemType type;
 
   const EmphasisType(this.type);
 }
 
-class Emphasis extends Plain {
-  EmphasisType emphasisType;
+class Emphasis extends Inline {
+  final EmphasisType emphasisType;
 
-  Emphasis(this.emphasisType, super.text) : super(type: emphasisType.type);
+  Emphasis(this.emphasisType, String text) : super(emphasisType.type, text: text);
 }
 
 enum Lang {
@@ -40,8 +34,12 @@ enum Lang {
   }
 }
 
-class CodeBlock extends Plain {
-  Lang lang;
+class Code extends Inline {
+  final Lang lang;
 
-  CodeBlock(String text, this.lang) : super(text, type: ElementType.code);
+  Code(this.lang, {String? text}) : super(ElemType.code, text: text ?? '');
+
+  static Code from(Element element) {
+    return Code(Lang.of(element.attributes['class'] ?? ''), text: element.children?.first.textContent);
+  }
 }

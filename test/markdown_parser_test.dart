@@ -12,13 +12,13 @@ void main() {
     var isHeading = elements.first is Heading;
     expect(isHeading, true);
     expect((elements.first as Heading).level, 2);
-    expect((elements.first as Heading).text, "header");
+    expect((elements.first as Heading).children.first.text, "header");
   });
 
   test("given text `**text**`,when parse, then the first element is Paragraph and its first child is `bold`", () {
     String text = "**text**";
 
-    List<MarkdownElement> elements = parser.parse(text);
+    List<MarkdownElem> elements = parser.parse(text);
 
     var isParagraph = elements.first is Paragraph;
     expect(isParagraph, true);
@@ -51,9 +51,9 @@ void main() {
     var isParagraph = elements.first is Paragraph;
     expect(isParagraph, true);
     var firstChild = (elements.first as Paragraph).children.first;
-    var isCodeBlock = firstChild is CodeBlock;
+    var isCodeBlock = firstChild is Code;
     expect(isCodeBlock, true);
-    expect((firstChild as CodeBlock).lang.type, '');
+    expect((firstChild as Code).lang.type, '');
     expect(firstChild.text, 'text');
   });
 
@@ -76,8 +76,8 @@ void main() {
     expect(0, firstLine.listInfo.depth);
     expect(ListType.unOrdered, firstLine.listInfo.listType);
     expect(0, firstLine.index);
-    MarkdownElement content = (firstLine.children.first).children.first;
-    expect("u1", (content as Plain).text);
+    MarkdownElem content = (firstLine.children.first).children.first;
+    expect("u1", (content as TextElem).text);
   });
 
   test("given ordered list, when parse, then the first line is MarkdownListItem and the content is correct", () {
@@ -91,12 +91,12 @@ void main() {
     expect(0, firstLine.listInfo.depth);
     expect(ListType.ordered, firstLine.listInfo.listType);
     expect(0, firstLine.index);
-    MarkdownElement content = (firstLine.children.first).children.first;
-    expect("one", (content as Plain).text);
+    MarkdownElem content = (firstLine.children.first).children.first;
+    expect("one", (content as TextElem).text);
     var secondLine = elements[1] as MarkdownListLine;
     expect(1, secondLine.index);
-    MarkdownElement content2 = (secondLine.children.first).children.first;
-    expect("two", (content2 as Plain).text);
+    MarkdownElem content2 = (secondLine.children.first).children.first;
+    expect("two", (content2 as TextElem).text);
   });
 
   test("given ordered list including unordered list, when parse, then the list are all correct", () {
@@ -119,49 +119,49 @@ void main() {
     expect(0, firstLine.listInfo.depth);
     expect(ListType.ordered, firstLine.listInfo.listType);
     expect(0, firstLine.index);
-    MarkdownElement content = (firstLine.children.first).children.first;
-    expect("one", (content as Plain).text);
+    MarkdownElem content = (firstLine.children.first).children.first;
+    expect("one", (content as TextElem).text);
     var secondLine = elements[1] as MarkdownListLine;
     expect(1, secondLine.index);
-    MarkdownElement content2 = (secondLine.children.first).children.first;
-    expect("two", (content2 as Plain).text);
+    MarkdownElem content2 = (secondLine.children.first).children.first;
+    expect("two", (content2 as TextElem).text);
     var firstInsideLine = elements[2] as MarkdownListLine;
     expect(1, firstInsideLine.listInfo.depth);
     expect(ListType.unOrdered, firstInsideLine.listInfo.listType);
     expect(0, firstInsideLine.index);
-    MarkdownElement insideContent = (firstInsideLine.children.first).children.first;
-    expect("u1", (insideContent as Plain).text);
+    MarkdownElem insideContent = (firstInsideLine.children.first).children.first;
+    expect("u1", (insideContent as TextElem).text);
     var secondInsideLine = elements[3] as MarkdownListLine;
     expect(1, secondInsideLine.index);
-    MarkdownElement insideContent2 = (secondInsideLine.children.first).children.first;
-    expect("u2", (insideContent2 as Plain).text);
+    MarkdownElem insideContent2 = (secondInsideLine.children.first).children.first;
+    expect("u2", (insideContent2 as TextElem).text);
   });
 
   test("given markdown image,when parse, then the first element is Paragraph and its first child is `ImageLink`", () {
     String text = "![img](https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg)";
 
-    List<MarkdownElement> elements = parser.parse(text);
+    List<MarkdownElem> elements = parser.parse(text);
 
     var isParagraph = elements.first is Paragraph;
     expect(isParagraph, true);
     var firstChild = (elements.first as Paragraph).children.first;
     var isMarkdownImage = firstChild is ImageLink;
     expect(isMarkdownImage, true);
-    expect((firstChild as ImageLink).address, "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg");
+    expect((firstChild as ImageLink).src, "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg");
     expect(firstChild.alt, 'img');
   });
 
   test("given markdown link, when parse, then the first element is Paragraph and its first child is `UrlLink`", () {
     String text = "[link](https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg)";
 
-    List<MarkdownElement> elements = parser.parse(text);
+    List<MarkdownElem> elements = parser.parse(text);
 
     var isParagraph = elements.first is Paragraph;
     expect(isParagraph, true);
     var firstChild = (elements.first as Paragraph).children.first;
     var isLink = firstChild is UrlLink;
     expect(isLink, true);
-    expect((firstChild as UrlLink).address, "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg");
+    expect((firstChild as UrlLink).link, "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg");
     expect(firstChild.text, 'link');
   });
 }

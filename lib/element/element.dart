@@ -1,41 +1,54 @@
-part 'group_element.dart';
+import 'package:markdown/markdown.dart';
+
+part 'block_element.dart';
 
 part 'link_element.dart';
 
 part 'text_element.dart';
 
-abstract class MarkdownElement {
-  final ElementType type;
+abstract class MarkdownElem {
+  final ElemType type;
   final String text;
 
-  MarkdownElement(this.type, this.text);
+  MarkdownElem(this.type, this.text);
 }
 
-enum ElementType {
-  paragraph('p', isParent: true),
-  blockQuote('blockquote', isParent: true, inline: false),
-  preformatted('pre', isParent: true, inline: false),
-  orderList('ol', isParent: true, inline: false),
-  unOrderList('ul', isParent: true, inline: false),
-  listLine('li', isParent: true, inline: false),
-  heading('h[1-6]', isParent: false, inline: false),
-  bold('strong'),
-  italic('em'),
-  code('code'),
-  image('img'),
-  link('a'),
-  plain('');
+abstract class Block<T extends MarkdownElem> extends MarkdownElem {
+  final List<T> children = List.empty(growable: true);
+
+  Block(ElemType type, {String text = ''}) : super(type, text);
+}
+
+abstract class Inline extends MarkdownElem {
+  Inline(ElemType type, {String text = ''}) : super(type, text);
+}
+
+enum ElemType {
+  heading('h[1-6]'),
+  rule('hr'),
+  paragraph('p'),
+  preformatted('pre'),
+  blockQuote('blockquote', blockInside: true),
+  orderList('ol', blockInside: true),
+  unOrderList('ul', blockInside: true),
+  listLine('li', blockInside: true),
+  bold('strong', inline: true),
+  italic('em', inline: true),
+  code('code', inline: true),
+  image('img', inline: true),
+  link('a', inline: true),
+  text('', inline: true);
 
   final String tag;
-  final bool isParent; // need break down to smaller elements
-  final bool inline; // need wrap on display
+  final bool blockInside; // can contain blocks
+  final bool inline; // can not contain ?line break?
 
-  static final _headingPattern = RegExp(ElementType.heading.tag);
+  static final _headingPattern = RegExp(ElemType.heading.tag);
 
-  const ElementType(this.tag, {this.isParent = false, this.inline = true});
+  const ElemType(this.tag, {this.blockInside = false, this.inline = false});
 
-  static ElementType of(String tag) {
-    if (_headingPattern.hasMatch(tag)) return ElementType.heading;
-    return ElementType.values.firstWhere((element) => element.tag == tag, orElse: () => ElementType.plain);
+  static ElemType of(String tag) {
+    if (_headingPattern.hasMatch(tag)) return ElemType.heading;
+    return ElemType.values.firstWhere((element) => element.tag == tag, orElse: () => ElemType.text);
   }
 }

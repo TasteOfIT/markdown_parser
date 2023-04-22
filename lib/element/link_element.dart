@@ -1,19 +1,31 @@
 part of 'element.dart';
 
-abstract class Link extends MarkdownElement {
-  String address;
+class ImageLink extends Inline {
+  final String src;
+  final String? alt;
+  final String? title;
 
-  Link(this.address, super.type, super.text);
+  ImageLink(this.src, {this.alt, this.title}) : super(ElemType.image, text: alt ?? title ?? '');
+
+  static ImageLink from(Element element) {
+    String src = element.attributes['src'] ?? '';
+    String? alt = element.attributes['alt'];
+    String? title = element.attributes['title'];
+    return ImageLink(src, alt: alt, title: title);
+  }
 }
 
-class ImageLink extends Link {
-  final String alt;
+class UrlLink extends Inline {
+  final String link;
+  final String? label;
+  final String? title;
 
-  ImageLink(String address, this.alt) : super(address, ElementType.image, alt);
-}
+  UrlLink(this.link, {this.label, this.title}) : super(ElemType.link, text: label ?? title ?? '');
 
-class UrlLink extends Link {
-  final String name;
-
-  UrlLink(String address, this.name) : super(address, ElementType.link, name);
+  static UrlLink from(Element element) {
+    String link = element.attributes['href'] ?? '';
+    String? label = element.children?.first.textContent;
+    String? title = element.attributes['title'];
+    return UrlLink(link, label: label, title: title);
+  }
 }

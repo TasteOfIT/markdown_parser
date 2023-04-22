@@ -3,121 +3,167 @@ import 'package:markdown/markdown.dart';
 import 'element/element.dart';
 
 class MarkdownConverter {
-  void convert(List<MarkdownElement> output, Node node, int depth) {
+  void convert(List<MarkdownElem> output, Node node, int depth) {
     if (node is! Element) {
-      output.add(Plain(node.textContent));
+      output.add(TextElem(node.textContent));
       return;
     }
 
-    ElementType elementType = ElementType.of(node.tag);
-    if (elementType.isParent) {
-      _breakDown(output, node, elementType, depth);
+    ElemType elemType = ElemType.of(node.tag);
+    if (elemType.inline) {
+      output.add(_convertToInline(node, depth));
     } else {
-      output.add(_convertToElement(node, depth));
+      _parseBlock(output, node, elemType, depth);
     }
   }
 
-  MarkdownElement _convertToElement(Element element, int depth) {
+  Inline _convertToInline(Element element, int depth) {
+    // case ElemType.heading:
+    // return ;
     var childText = element.children?.first.textContent;
-    switch (ElementType.of(element.tag)) {
-      case ElementType.heading:
-        return Heading(int.parse(element.tag.substring(1, 2)), element.textContent);
-      case ElementType.bold:
+    switch (ElemType.of(element.tag)) {
+      case ElemType.bold:
         return Emphasis(EmphasisType.bold, childText ?? element.textContent);
-      case ElementType.italic:
+      case ElemType.italic:
         return Emphasis(EmphasisType.italic, childText ?? element.textContent);
-      case ElementType.code:
-        return CodeBlock(childText ?? '', Lang.of(element.attributes['class'] ?? ''));
-      case ElementType.image:
-        return ImageLink(element.attributes['src'] ?? '', element.attributes['alt'] ?? '');
-      case ElementType.link:
-        return UrlLink(element.attributes['href'] ?? '', childText ?? '');
-      case ElementType.plain:
+      case ElemType.code:
+        return Code.from(element);
+      case ElemType.image:
+        return ImageLink.from(element);
+      case ElemType.link:
+        return UrlLink.from(element);
+      case ElemType.text:
       default:
-        return Plain(childText ?? '');
+        return TextElem(childText ?? '');
     }
+  }
+
+  void _parseBlock(List<MarkdownElem> output, Element element, ElemType type, int depth) {
+    switch (type) {
+      case ElemType.heading:
+        output.add(_convertToHeading(element, depth));
+        break;
+      case ElemType.rule:
+        output.add(Rule());
+        break;
+      case ElemType.preformatted:
+        output.add(_convertToPreformatted(element, depth));
+        break;
+      case ElemType.paragraph:
+        output.add(_convertToParagraph(element, depth));
+        break;
+      case ElemType.blockQuote:
+        output.add(_convertToBackQuote(element, depth));
+        break;
+      case ElemType.orderList:
+      case ElemType.unOrderList:
+        output
+            .addAll(_convertToList(element, depth, type == ElemType.orderList ? ListType.ordered : ListType.unOrdered));
+        break;
+      case ElemType.listLine:
+      // Should not come here
+      default:
+        break;
+    }
+  }
+
+  Heading _convertToHeading(Element element, int depth) {
+    var heading = Heading(int.parse(element.tag.substring(1, 2)));
+    var children = element.children;
+    if (children == null) {
+      heading.children.add(TextElem(element.textContent));
+    } else {
+      for (var child in children) {
+        if (child is! Element) {
+          heading.children.add(TextElem(child.textContent));
+        } else if (ElemType.of(child.tag).inline) {
+          heading.children.add(_convertToInline(child, depth));
+        }
+      }
+    }
+    return heading;
   }
 
   Preformatted _convertToPreformatted(Element element, int depth) {
     Node? child = element.children?.first;
-    if (child != null && child is Element && ElementType.of(child.tag) == ElementType.code) {
-      CodeBlock? content = _convertToElement(child, depth) as CodeBlock?;
-      return Preformatted(content ?? CodeBlock(child.textContent, Lang.none), depth);
+    // For now it could be code only
+    if (child != null && child is Element && ElemType.of(child.tag) == ElemType.code) {
+      return Preformatted(Code.from(child), depth);
     } else {
-      return Preformatted(CodeBlock(child?.textContent ?? '', Lang.none), depth);
+      return Preformatted(Code(Lang.none, text: child?.textContent), depth);
     }
   }
 
-  void _breakDown(List<MarkdownElement> output, Element element, ElementType type, int depth) {
-    switch (type) {
-      case ElementType.preformatted:
-        output.add(_convertToPreformatted(element, depth));
-        break;
-      case ElementType.paragraph:
-        Paragraph paragraph = Paragraph();
-        output.add(paragraph);
-        _breakDownParagraph(output, paragraph, element, depth);
-        break;
-      case ElementType.blockQuote:
-        Paragraph paragraph = Paragraph(isBackQuote: true);
-        output.add(paragraph);
-        _breakDownParagraph(output, paragraph, element, depth);
-        break;
-      case ElementType.orderList:
-        _breakDownList(output, element, depth, ListType.ordered);
-        break;
-      case ElementType.unOrderList:
-        _breakDownList(output, element, depth, ListType.unOrdered);
-        break;
-      case ElementType.listLine:
-        // Should not come here
-        break;
-      default:
-        break;
-    }
-  }
-
-  void _breakDownParagraph(List<MarkdownElement> output, Paragraph paragraph, Element element, int depth) {
+  Paragraph _convertToParagraph(Element element, int depth) {
+    Paragraph paragraph = Paragraph();
     var children = element.children;
     if (children != null) {
       for (var node in children) {
         if (node is! Element) {
-          paragraph.children.add(Plain(node.textContent));
+          paragraph.children.add(TextElem(node.textContent));
         } else {
-          ElementType type = ElementType.of(node.tag);
-          if (type.isParent) {
-            _breakDown(output, node, type, depth + 1);
-            break; // Should have no more children after this
+          paragraph.children.add(_convertToInline(node, depth));
+        }
+      }
+    } else {
+      paragraph.children.add(TextElem(''));
+    }
+    return paragraph;
+  }
+
+  void _breakDownBlocks(List<Block> output, Paragraph paragraph, Element element, int depth) {
+    var children = element.children;
+    if (children != null) {
+      for (var node in children) {
+        if (node is! Element) {
+          paragraph.children.add(TextElem(node.textContent));
+        } else {
+          ElemType type = ElemType.of(node.tag);
+          if (type.inline) {
+            Inline outputElem = _convertToInline(node, depth);
+            paragraph.children.add(outputElem);
           } else {
-            MarkdownElement outputElem = _convertToElement(node, depth);
-            if (outputElem.type.inline) {
-              paragraph.children.add(outputElem);
-            } else {
-              output.add(outputElem);
-              break; // Should have no more children after this
-            }
+            _parseBlock(output, node, type, depth + 1);
+            break; // Should have no more children after this
           }
         }
       }
     }
   }
 
-  void _breakDownList(List<MarkdownElement> output, Element element, int depth, ListType type, {int index = 0}) {
+  BlockQuote _convertToBackQuote(Element element, int depth) {
+    var blockQuote = BlockQuote();
+    var children = element.children;
+    if (children != null) {
+      Paragraph paragraph = Paragraph();
+      blockQuote.children.add(paragraph);
+      _breakDownBlocks(blockQuote.children, paragraph, element, depth);
+    }
+    return blockQuote;
+  }
+
+  void _breakDownList(List<Block> output, Element element, ListInfo listInfo, {int index = 0}) {
     if (element.children == null) return;
 
-    ListInfo listInfo = ListInfo(type, depth);
     int currentLineIndex = index;
     for (Node node in element.children!) {
-      if (node is Element && ElementType.of(node.tag) == ElementType.listLine) {
+      if (node is Element && ElemType.of(node.tag) == ElemType.listLine) {
         MarkdownListLine listLine = MarkdownListLine(listInfo, currentLineIndex);
         output.add(listLine);
 
         Paragraph paragraph = Paragraph();
         listLine.children.add(paragraph);
-        _breakDownParagraph(output, paragraph, node, depth);
+        _breakDownBlocks(output, paragraph, node, listInfo.depth);
 
         currentLineIndex += 1;
       }
     }
+  }
+
+  List<Block> _convertToList(Element element, int depth, ListType type) {
+    List<Block> blocks = List.empty(growable: true);
+    int start = int.parse(element.attributes['start'] ?? '0');
+    _breakDownList(blocks, element, ListInfo(type, depth), index: start);
+    return blocks;
   }
 }
