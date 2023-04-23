@@ -1,24 +1,23 @@
 part of 'element.dart';
 
-class Heading extends Block<Inline> {
-  final int level;
-
-  Heading(this.level) : super(ElemType.heading);
-}
-
 class Rule extends Block<Inline> {
   Rule() : super(ElemType.rule, text: '');
 }
 
 class Paragraph extends Block<Inline> {
-  Paragraph() : super(ElemType.paragraph);
+  Paragraph({ElemType? type}) : super(type ?? ElemType.paragraph);
+}
+
+class Heading extends Paragraph {
+  final int level;
+
+  Heading(this.level) : super(type: ElemType.heading);
 }
 
 class Preformatted extends Block<Inline> {
   final Code content;
-  final int depth;
 
-  Preformatted(this.content, this.depth) : super(ElemType.preformatted);
+  Preformatted(this.content) : super(ElemType.preformatted);
 }
 
 class BlockQuote extends Block<Block> {

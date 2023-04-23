@@ -20,6 +20,8 @@ abstract class Block<T extends MarkdownElem> extends MarkdownElem {
 }
 
 abstract class Inline extends MarkdownElem {
+  final List<Inline> spanChildren = List.empty(growable: true);
+
   Inline(ElemType type, {String text = ''}) : super(type, text);
 }
 
